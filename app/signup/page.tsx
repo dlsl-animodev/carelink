@@ -277,7 +277,7 @@ export default function SignupPage() {
     return () => {
       document.body.style.overflow = 'auto';
     };
-  })
+  }, [])
   
   return (
     <div className="flex h-[90dvh] items-center justify-center bg-gray-50 px-4">
