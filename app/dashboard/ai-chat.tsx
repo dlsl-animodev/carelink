@@ -61,9 +61,10 @@ export function AiChatPanel() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-blue-600 text-white shadow-lg flex items-center justify-center hover:bg-blue-700 hover:cursor-pointer transition-all hover:scale-105 z-50"
+        className="fixed bottom-6 right-6 h-14 w-32 rounded-full bg-orange-600 text-white shadow-lg flex items-center justify-center hover:bg-orange-700 hover:cursor-pointer transition-all hover:scale-105 z-50"
       >
-        <Sparkles className="h-6 w-6" />
+        <Sparkles className="h-6 w-6 mr-2" />
+        Ask AI
       </button>
     )
   }

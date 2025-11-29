@@ -397,7 +397,7 @@ export function DashboardClient({
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-blue-900">
+          <h1 className="text-3xl font-bold text-amber-600">
             Welcome back, {capitalizedUserName}
           </h1>
           <p className="text-gray-600">
@@ -408,7 +408,7 @@ export function DashboardClient({
         </div>
         <div className="flex items-center gap-3">
           <Link href="/book">
-            <Button className="bg-blue-600 hover:bg-blue-700 hover:cursor-pointer">
+            <Button className="bg-orange-600 hover:bg-blue-700 hover:cursor-pointer">
               <Plus className="mr-2 h-4 w-4" />
               {role === "doctor" ? "View Schedule" : "Book Appointment"}
             </Button>
@@ -708,7 +708,7 @@ export function DashboardClient({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
             <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-blue-600" />
+              <Calendar className="h-5 w-5 text-orange-600" />
               Upcoming Consults
             </h2>
 
@@ -795,7 +795,7 @@ export function DashboardClient({
             {/* order medications */}
             <div className="mt-8">
               <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2 mb-4">
-                <ShoppingCart className="h-5 w-5 text-blue-600" />
+                <ShoppingCart className="h-5 w-5 text-orange-600" />
                 Order Medications
               </h2>
               <Card>
@@ -964,7 +964,7 @@ export function DashboardClient({
             {/* medical history */}
             <div className="mt-8">
               <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2 mb-4">
-                <History className="h-5 w-5 text-blue-600" />
+                <History className="h-5 w-5 text-orange-600" />
                 Medical History
               </h2>
               <Card>
@@ -1027,7 +1027,7 @@ export function DashboardClient({
 
           <div className="space-y-6">
             <div className="flex items-center gap-2">
-              <Pill className="h-5 w-5 text-blue-600" />
+              <Pill className="h-5 w-5 text-orange-600" />
               <h2 className="text-xl font-semibold text-gray-800">
                 My Prescriptions
               </h2>
@@ -1123,17 +1123,17 @@ export function DashboardClient({
               </CardContent>
             </Card>
 
-            <Card className="bg-blue-600 text-white border-none">
+            <Card className="bg-orange-400 text-white border-none">
               <CardHeader>
                 <CardTitle className="text-lg">Need Help?</CardTitle>
-                <CardDescription className="text-blue-100">
+                <CardDescription className="text-amber-100">
                   24/7 support available
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Button
                   variant="secondary"
-                  className="w-full text-blue-900 font-bold hover:cursor-pointer"
+                  className="w-full text-amber-900 font-bold hover:cursor-pointer"
                   onClick={() => setSupportModalOpen(true)}
                 >
                   Contact Support
