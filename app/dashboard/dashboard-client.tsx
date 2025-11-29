@@ -149,6 +149,10 @@ export function DashboardClient({
   const role = profile?.role === "doctor" ? "doctor" : "patient";
   const userName =
     profile?.full_name || user.user_metadata?.full_name || "User";
+  const capitalizedUserName = userName
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
   const userEmail = user.email || "";
 
   const upcomingPatientAppointments = patientAppointments
@@ -384,7 +388,7 @@ export function DashboardClient({
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-blue-900">
-            Welcome back, {userName}
+            Welcome back, {capitalizedUserName}
           </h1>
           <p className="text-gray-600">
             {role === "doctor"
