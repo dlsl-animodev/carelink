@@ -1,4 +1,5 @@
 import { Video, Calendar, Sparkles } from "lucide-react";
+import Link from "next/link";
 
 export function Hero() {
   return (
@@ -43,7 +44,7 @@ export function Hero() {
 
             <p className="mt-6 text-xl text-paw-text max-w-lg mx-auto lg:mx-0 font-medium leading-relaxed">
               Skip the car ride anxiety! Book video consults, get meds
-              delivered, and track health history from your couch. 🛋️ 🧡
+              delivered, and track health history from your couch.
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -52,10 +53,13 @@ export function Hero() {
                 <Video className="mr-3 h-6 w-6" strokeWidth={3} />
                 Talk to a Vet
               </button>
-              <button className="inline-flex items-center justify-center px-8 py-5 border-2 border-orange-100 text-lg font-bold rounded-2xl text-paw-primaryDark bg-white hover:border-paw-primary hover:bg-orange-50 transition-all active:scale-95">
+              <Link
+                href="/book"
+                className="inline-flex items-center justify-center px-8 py-5 border-2 border-orange-100 text-lg font-bold rounded-2xl text-paw-primaryDark bg-white hover:border-paw-primary hover:bg-orange-50 transition-all active:scale-95"
+              >
                 <Calendar className="mr-3 h-6 w-6" strokeWidth={2.5} />
                 Book Checkup
-              </button>
+              </Link>
             </div>
           </div>
 
