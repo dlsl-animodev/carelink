@@ -21,13 +21,15 @@ export default function PetProfilePage({ searchParams }: PetProfilePageProps) {
     const prescriptionsRef = useRef<HTMLDivElement>(null);
     const historyRef = useRef<HTMLDivElement>(null);
 
-    const scrollTo = (ref: React.RefObject<HTMLDivElement>) => {
-        const yOffset = -80;
-        const y =
-            ref.current.getBoundingClientRect().top +
-            window.pageYOffset +
-            yOffset;
-        window.scrollTo({ top: y, behavior: "smooth" });
+    const scrollTo = (ref: React.RefObject<HTMLDivElement | null>) => {
+        if (ref.current) {
+            const yOffset = -80; // adjust offset
+            const y =
+                ref.current.getBoundingClientRect().top +
+                window.pageYOffset +
+                yOffset;
+            window.scrollTo({ top: y, behavior: "smooth" });
+        }
     };
 
     return (
