@@ -126,7 +126,7 @@ function SignupForm() {
   }
 
   return (
-    <Card className="w-full max-w-md mb-[7rem]">
+    <Card className="w-full max-w-md ">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold text-center text-blue-900">
           {isUpgrade && isAnonymous ? "Complete Your Account" : "Join PetCare"}
@@ -277,10 +277,10 @@ export default function SignupPage() {
     return () => {
       document.body.style.overflow = 'auto';
     };
-  })
+  }, [])
   
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+    <div className="flex h-[90dvh] items-center justify-center bg-gray-50 px-4">
       <Suspense fallback={<LoadingCard />}>
         <SignupForm />
       </Suspense>

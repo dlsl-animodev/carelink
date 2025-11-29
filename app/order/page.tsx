@@ -17,6 +17,8 @@ import { getPrescriptionById } from "./actions";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { redirect } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const samplePharmacies = [
     {
@@ -55,7 +57,7 @@ export default function OrderPage({ searchParams }: OrderPageProps) {
 
             if (!prescription) {
                 alert("Prescription not found");
-                redirect("/dashboard");
+                // redirect("/dashboard");
                 return;
             }
 
@@ -72,9 +74,13 @@ export default function OrderPage({ searchParams }: OrderPageProps) {
 
     return (
         <div className="container mx-auto py-8 px-4 space-y-8">
+            <Link href="/dashboard" className="text-blue-600 hover:underline ">
+                &larr; Back to Dashboard
+            </Link>
+
             {/* Title  */}
-            <div>
-                <h1 className="text-3xl font-bold text-blue-900">
+            <div className="mt-6">
+                <h1 className="text-3xl font-bold ">
                     Select a Pharmacy to Order From
                 </h1>
                 <p className="text-gray-600">
@@ -83,7 +89,7 @@ export default function OrderPage({ searchParams }: OrderPageProps) {
                 </p>
             </div>
             {/* Content  */}
-            <div className="flex flex-wrap gap-10">
+            <div className="flex flex-col gap-10">
                 {/* Floating Prescription Left Section */}
                 <section className="w-full">
                     <Card>
@@ -118,10 +124,7 @@ export default function OrderPage({ searchParams }: OrderPageProps) {
                 </section>
                 {/* Pharmacy List Right Section */}
                 <section>
-                    <p className="text-2xl font-bold text-blue-900 mb-4">
-                        {" "}
-                        Pharmacies List{" "}
-                    </p>
+                    <p className="text-2xl font-bold mb-4"> Pharmacies List </p>
                     <div className="space-y-6">
                         {samplePharmacies
                             .filter(
@@ -129,17 +132,17 @@ export default function OrderPage({ searchParams }: OrderPageProps) {
                                     pharmacy.isPrescriptionAvailable === true
                             )
                             .map((pharmacy) => (
-                                <Card key={pharmacy.id} className="w-96">
+                                <Card key={pharmacy.id} className="w-full">
                                     <CardContent>
                                         <h3 className="text-xl font-semibold mb-2">
                                             {pharmacy.name}
                                         </h3>
                                         <p>{pharmacy.address}</p>
                                         <p>Contact: {pharmacy.contact}</p>
-                                        <button
+                                        <Button
                                             className={`mt-4 px-4 py-2 rounded-2xl w-full ${
                                                 pharmacy.isPrescriptionAvailable
-                                                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                                                    ? ""
                                                     : "bg-gray-400 text-gray-700 cursor-not-allowed"
                                             }`}
                                             disabled={
@@ -155,7 +158,7 @@ export default function OrderPage({ searchParams }: OrderPageProps) {
                                             {pharmacy.isPrescriptionAvailable
                                                 ? "Order Prescription"
                                                 : "Prescription Not Available"}
-                                        </button>
+                                        </Button>
                                     </CardContent>
                                 </Card>
                             ))}
