@@ -1,60 +1,72 @@
-'use client'
+"use client";
 
-import { useState, useRef, useEffect } from 'react'
-import { sendChatMessage } from './chat-actions'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Bot, Loader2, Send, Sparkles, User, X, RotateCcw } from 'lucide-react'
-import ReactMarkdown from 'react-markdown'
+import { useState, useRef, useEffect } from "react";
+import { sendChatMessage } from "./chat-actions";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Bot, Loader2, Send, Sparkles, User, X, RotateCcw } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 interface Message {
-  role: 'user' | 'assistant'
-  content: string
+  role: "user" | "assistant";
+  content: string;
 }
 
 const suggestedQuestions = [
-  'Tell me about my current medications',
-  'When is my next appointment?',
-  'What should I ask my doctor?',
-  'Help me prepare for my visit',
-]
+  "Tell me about my current medications",
+  "When is my next appointment?",
+  "What should I ask my doctor?",
+  "Help me prepare for my visit",
+];
 
 export function AiChatPanel() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([])
-  const [input, setInput] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   async function handleSend(message?: string) {
-    const text = message || input.trim()
-    if (!text || isLoading) return
+    const text = message || input.trim();
+    if (!text || isLoading) return;
 
-    setInput('')
-    setMessages(prev => [...prev, { role: 'user', content: text }])
-    setIsLoading(true)
+    setInput("");
+    setMessages((prev) => [...prev, { role: "user", content: text }]);
+    setIsLoading(true);
 
     const result = await sendChatMessage(
       text,
-      messages.map(m => ({ role: m.role, content: m.content }))
-    )
+      messages.map((m) => ({ role: m.role, content: m.content }))
+    );
 
-    setIsLoading(false)
+    setIsLoading(false);
 
     if (result.error) {
-      setMessages(prev => [...prev, { role: 'assistant', content: `Sorry, ${result.error}` }])
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: `Sorry, ${result.error}` },
+      ]);
     } else if (result.response) {
-      setMessages(prev => [...prev, { role: 'assistant', content: result.response }])
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: result.response },
+      ]);
     }
   }
 
   function handleClearChat() {
-    setMessages([])
+    setMessages([]);
   }
 
   if (!isOpen) {
@@ -66,7 +78,7 @@ export function AiChatPanel() {
         <Sparkles className="h-6 w-6 mr-2" />
         Ask AI
       </button>
-    )
+    );
   }
 
   return (
@@ -77,7 +89,9 @@ export function AiChatPanel() {
             <Bot className="h-5 w-5" />
             <div>
               <CardTitle className="text-base">CareLink AI</CardTitle>
-              <CardDescription className="text-white/90 text-xs">Your personal health assistant</CardDescription>
+              <CardDescription className="text-white/90 text-xs">
+                Your personal health assistant
+              </CardDescription>
             </div>
           </div>
           <div className="flex items-center gap-1">
@@ -108,8 +122,13 @@ export function AiChatPanel() {
                 <Bot className="h-4 w-4 text-paw-primary" />
               </div>
               <div className="bg-gray-100 rounded-lg p-3 text-sm text-paw-text">
-                <p className="font-medium mb-2">Hi! I&apos;m your CareLink AI assistant.</p>
-                <p>I have access to your medical records, appointments, and prescriptions. Ask me anything about your healthcare!</p>
+                <p className="font-medium mb-2">
+                  Hi! I&apos;m your CareLink AI assistant.
+                </p>
+                <p>
+                  I have access to your medical records, appointments, and
+                  prescriptions. Ask me anything about your healthcare!
+                </p>
               </div>
             </div>
             <div className="space-y-2">
@@ -128,22 +147,31 @@ export function AiChatPanel() {
         ) : (
           <>
             {messages.map((msg, i) => (
-              <div key={i} className={`flex items-start gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${
-                  msg.role === 'user' ? 'bg-paw-primary' : 'bg-paw-soft'
-                }`}>
-                  {msg.role === 'user' ? (
+              <div
+                key={i}
+                className={`flex items-start gap-2 ${
+                  msg.role === "user" ? "flex-row-reverse" : ""
+                }`}
+              >
+                <div
+                  className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${
+                    msg.role === "user" ? "bg-paw-primary" : "bg-paw-soft"
+                  }`}
+                >
+                  {msg.role === "user" ? (
                     <User className="h-4 w-4 text-white" />
                   ) : (
                     <Bot className="h-4 w-4 text-paw-primary" />
                   )}
                 </div>
-                <div className={`rounded-lg p-3 text-sm max-w-[85%] ${
-                  msg.role === 'user'
-                    ? 'bg-paw-primary text-white'
-                    : 'bg-gray-100 text-paw-text'
-                }`}>
-                  {msg.role === 'assistant' ? (
+                <div
+                  className={`rounded-lg p-3 text-sm max-w-[85%] ${
+                    msg.role === "user"
+                      ? "bg-paw-primary text-white"
+                      : "bg-gray-100 text-paw-text"
+                  }`}
+                >
+                  {msg.role === "assistant" ? (
                     <div className="prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0 prose-headings:my-2 prose-headings:text-paw-dark">
                       <ReactMarkdown>{msg.content}</ReactMarkdown>
                     </div>
@@ -171,8 +199,8 @@ export function AiChatPanel() {
       <div className="p-3 border-t">
         <form
           onSubmit={(e) => {
-            e.preventDefault()
-            handleSend()
+            e.preventDefault();
+            handleSend();
           }}
           className="flex gap-2"
         >
@@ -197,5 +225,5 @@ export function AiChatPanel() {
         </p>
       </div>
     </Card>
-  )
+  );
 }

@@ -1104,9 +1104,7 @@ export function DashboardClient({
               <CardContent className="space-y-3">
                 {upcomingPatientAppointments.length === 0 &&
                 refillReminders.length === 0 ? (
-                  <p className="text-sm text-paw-text">
-                    No upcoming reminders
-                  </p>
+                  <p className="text-sm text-paw-text">No upcoming reminders</p>
                 ) : (
                   <>
                     {upcomingPatientAppointments.slice(0, 2).map((apt) => (
