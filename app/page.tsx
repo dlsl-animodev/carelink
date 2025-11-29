@@ -180,7 +180,10 @@ export default async function Home() {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-slate-200 bg-white p-7 flex items-center gap-4 hover:shadow-md transition">
+              <Link
+                href="/history"
+                className="rounded-2xl border border-slate-200 bg-white p-7 flex items-center gap-4 hover:shadow-md transition"
+              >
                 <div className="h-12 w-12 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600">
                   <ClipboardList className="h-6 w-6" />
                 </div>
@@ -188,7 +191,7 @@ export default async function Home() {
                   <h4 className="font-semibold text-slate-900">My History</h4>
                   <p className="text-xs text-slate-500">Medical Records</p>
                 </div>
-              </div>
+              </Link>
             </div>
           </section>
 
