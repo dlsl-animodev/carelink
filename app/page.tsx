@@ -5,8 +5,6 @@ import { Input } from "@/components/ui/input";
 import {
   Heart,
   Eye,
-  Wind,
-  SmilePlus,
   Search,
   Pill,
   ClipboardList,
@@ -19,18 +17,18 @@ import {
 import { createClient } from "@/utils/supabase/server";
 
 const SPECIALTIES = [
-  { name: "General Medicine", icon: PillBottle },
-  { name: "Optometrist", icon: Eye },
-  { name: "Pulmonologist", icon: Wind },
-  { name: "Dentist", icon: SmilePlus },
-  { name: "Cardiologist", icon: Heart },
+  { name: "General Veterinary", icon: PillBottle },
+  { name: "Surgery", icon: ClipboardList },
+  { name: "Cardiology", icon: Heart },
+  { name: "Ophthalmology", icon: Eye },
+  { name: "Dentistry", icon: Pill },
 ];
 
 const HOW_IT_WORKS = [
   {
-    title: "Choose Your Doctor",
+    title: "Choose Your Veterinary Specialist",
     description:
-      "Browse the list of available doctors and select one that matches your medical needs or specialty.",
+      "Browse the list of available Specialist and select one that matches your pet needs.",
     icon: UserRound,
   },
   {
@@ -39,9 +37,9 @@ const HOW_IT_WORKS = [
     icon: CalendarCheck,
   },
   {
-    title: "Meet your doctor online",
+    title: "Meet your veterinary specialist online",
     description:
-      "Connect with your doctor and receive your medical evaluation right from your device.",
+      "Connect with your veterinary specialist and receive your medical evaluation right from your device.",
     icon: Video,
   },
 ];
@@ -89,7 +87,7 @@ export default async function Home() {
                   : ""}
                 ! 👋
               </h1>
-              <p className="text-slate-500">How are you feeling?</p>
+              <p className="text-slate-500">How are your pets feeling?</p>
             </div>
             <div className="relative w-full md:w-80">
               <Input
@@ -134,15 +132,17 @@ export default async function Home() {
               ))}
             </div>
           </section>
+          <Button>Register new pet</Button>
 
           <section className="grid md:grid-cols-3 gap-6">
             <div className="md:col-span-2 rounded-3xl bg-blue-50 p-6 flex flex-col justify-between min-h-60">
               <div>
                 <h3 className="text-xl font-bold text-slate-900 mb-1">
-                  Not feeling well?
+                  Pet not feeling well?
                 </h3>
                 <p className="text-slate-500 text-sm">
-                  Need to talk to a doctor?
+                  Pet acting a little weird today? Let us help them feel their
+                  best again!
                 </p>
               </div>
               <Link href="/book">
