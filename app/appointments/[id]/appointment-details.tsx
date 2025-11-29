@@ -230,7 +230,10 @@ function ChatInterface({
                       )}
                     </div>
 
-                    <Link href="/order" className="block">
+                    <Link
+                      href={`/dashboard?tab=prescriptions`}
+                      className="block"
+                    >
                       <Button className="w-full bg-paw-primary hover:bg-paw-primaryDark text-white shadow-md hover:shadow-lg transition-all rounded-xl hover:cursor-pointer">
                         Order from Pharmacy
                       </Button>
