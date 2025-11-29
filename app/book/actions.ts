@@ -7,14 +7,29 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { z } from "zod";
 
-export type Doctor = {
+export type Veterinarian = {
   id: string;
+  user_id: string | null;
+  clinic_id: string | null;
   name: string;
   specialty: string;
+  species_treated: string[];
+  license_number: string | null;
   bio: string | null;
   image_url: string | null;
+  years_experience: number | null;
+  is_available: boolean;
   created_at: string;
+  vet_clinics?: {
+    id: string;
+    name: string;
+    city: string | null;
+    emergency_services: boolean;
+  } | null;
 };
+
+// backwards compatibility alias
+export type Doctor = Veterinarian;
 
 export async function getGeminiApiKey() {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -25,15 +40,22 @@ export async function getGeminiApiKey() {
 }
 
 const createAppointmentSchema = z.object({
-  doctorId: z.string().uuid({ message: "Choose a valid doctor." }),
+  veterinarianId: z.string().uuid({ message: "Choose a valid veterinarian." }),
+  petId: z.string().uuid({ message: "Choose a valid pet." }).optional(),
   date: z.string().min(1, "Date is required."),
   time: z.string().min(1, "Time is required."),
-  notes: z.string().min(5, "Please add a brief note about your visit."),
+  symptoms: z.string().min(5, "Please describe your pet's symptoms or reason for visit."),
+  visitType: z.enum(["checkup", "vaccination", "surgery", "grooming", "emergency", "dental", "follow_up", "other"]).default("checkup"),
 });
 
 const guestPreConsultSchema = z.object({
-  doctorId: z.string().uuid({ message: "Choose a valid doctor." }),
-  symptoms: z.string().min(10, "Share a brief description of your symptoms."),
+  veterinarianId: z.string().uuid({ message: "Choose a valid veterinarian." }),
+  petName: z.string().min(1, "Pet name is required.").optional(),
+  petSpecies: z.string().min(1, "Species is required.").optional(),
+  petBreed: z.string().optional(),
+  petAge: z.string().optional(),
+  petWeightKg: z.coerce.number().positive().optional(),
+  symptoms: z.string().min(10, "Share a brief description of your pet's symptoms."),
   goal: z
     .string()
     .min(5, "Let us know what you want to achieve from this visit.")
@@ -62,44 +84,72 @@ async function getOrCreateGuestToken() {
   return token;
 }
 
-export async function getDoctors(): Promise<Doctor[]> {
+export async function getVeterinarians(): Promise<Veterinarian[]> {
   const supabase = await createClient();
 
-  const { data: doctors, error } = await supabase
-    .from("doctors")
-    .select("*")
+  const { data: veterinarians, error } = await supabase
+    .from("veterinarians")
+    .select(`
+      *,
+      vet_clinics (
+        id,
+        name,
+        city,
+        emergency_services
+      )
+    `)
+    .eq("is_available", true)
     .order("name");
 
   if (error) {
-    console.error("Error fetching doctors:", error);
+    console.error("Error fetching veterinarians:", error);
     return [];
   }
 
-  return doctors ?? [];
+  return veterinarians ?? [];
 }
 
-export async function getDoctorById(id: string) {
+// backwards compatibility alias
+export const getDoctors = getVeterinarians;
+
+export async function getVeterinarianById(id: string): Promise<Veterinarian | null> {
   const supabase = await createClient();
-  const { data: doctor, error } = await supabase
-    .from("doctors")
-    .select("*")
+  const { data: veterinarian, error } = await supabase
+    .from("veterinarians")
+    .select(`
+      *,
+      vet_clinics (
+        id,
+        name,
+        city,
+        emergency_services
+      )
+    `)
     .eq("id", id)
     .single();
 
   if (error) {
-    console.error("Error fetching doctor:", error);
+    console.error("Error fetching veterinarian:", error);
     return null;
   }
 
-  return doctor;
+  return veterinarian;
 }
+
+// backwards compatibility alias
+export const getDoctorById = getVeterinarianById;
 
 export async function createGuestPreConsult(formData: FormData) {
   const guestToken = await getOrCreateGuestToken();
   const supabase = await createClient({ guestToken });
 
   const parsed = guestPreConsultSchema.safeParse({
-    doctorId: formData.get("doctorId"),
+    veterinarianId: formData.get("veterinarianId") || formData.get("doctorId"),
+    petName: formData.get("petName"),
+    petSpecies: formData.get("petSpecies"),
+    petBreed: formData.get("petBreed"),
+    petAge: formData.get("petAge"),
+    petWeightKg: formData.get("petWeightKg"),
     symptoms: formData.get("symptoms"),
     goal: formData.get("goal"),
     urgency: formData.get("urgency") ?? "normal",
@@ -113,7 +163,12 @@ export async function createGuestPreConsult(formData: FormData) {
 
   const { error } = await supabase.from("guest_pre_consults").insert({
     session_token: guestToken,
-    doctor_id: parsed.data.doctorId,
+    veterinarian_id: parsed.data.veterinarianId,
+    pet_name: parsed.data.petName,
+    pet_species: parsed.data.petSpecies,
+    pet_breed: parsed.data.petBreed,
+    pet_age: parsed.data.petAge,
+    pet_weight_kg: parsed.data.petWeightKg,
     symptoms: parsed.data.symptoms,
     goal: parsed.data.goal,
     urgency: parsed.data.urgency,
@@ -131,10 +186,12 @@ export async function createAppointment(formData: FormData) {
   const supabase = await createClient();
 
   const parsed = createAppointmentSchema.safeParse({
-    doctorId: formData.get("doctorId"),
+    veterinarianId: formData.get("veterinarianId") || formData.get("doctorId"),
+    petId: formData.get("petId"),
     date: formData.get("date"),
     time: formData.get("time"),
-    notes: formData.get("notes"),
+    symptoms: formData.get("symptoms") || formData.get("notes"),
+    visitType: formData.get("visitType") ?? "checkup",
   });
 
   if (!parsed.success) {
@@ -143,11 +200,11 @@ export async function createAppointment(formData: FormData) {
     return { error: message };
   }
 
-  const appointmentDate = new Date(
+  const scheduledAt = new Date(
     `${parsed.data.date}T${parsed.data.time}:00`
   );
 
-  if (Number.isNaN(appointmentDate.getTime())) {
+  if (Number.isNaN(scheduledAt.getTime())) {
     return { error: "Invalid appointment date or time." };
   }
 
@@ -160,23 +217,25 @@ export async function createAppointment(formData: FormData) {
   // check if user is anonymous - they need to register first
   const { data: profile } = await supabase
     .from("profiles")
-    .select("is_anonymous")
+    .select("role")
     .eq("id", user.id)
     .single();
 
-  if (profile?.is_anonymous) {
+  if (!profile) {
     return {
       error: "Please create an account to book appointments",
       requiresRegistration: true,
-      redirectTo: `/signup?upgrade=true&next=/book/${parsed.data.doctorId}`,
+      redirectTo: `/signup?upgrade=true&next=/book/${parsed.data.veterinarianId}`,
     };
   }
 
   const { error } = await supabase.from("appointments").insert({
-    patient_id: user.id,
-    doctor_id: parsed.data.doctorId,
-    date: appointmentDate.toISOString(),
-    notes: parsed.data.notes,
+    owner_id: user.id,
+    pet_id: parsed.data.petId || null,
+    veterinarian_id: parsed.data.veterinarianId,
+    scheduled_at: scheduledAt.toISOString(),
+    symptoms: parsed.data.symptoms,
+    visit_type: parsed.data.visitType,
     status: "pending",
   });
 
@@ -192,6 +251,9 @@ export async function createAppointment(formData: FormData) {
   redirect("/dashboard?booked=true");
 }
 
-export async function revalidateDoctors() {
+export async function revalidateVeterinarians() {
   revalidatePath("/book");
 }
+
+// backwards compatibility alias
+export const revalidateDoctors = revalidateVeterinarians;
