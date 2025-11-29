@@ -944,7 +944,7 @@ export function DashboardClient({
                                                                 </Badge>
                                                             ) : (
                                                                 <Link
-                                                                  href={`/order?prescriptionId=${script.id}`}
+                                                                    href={`/order?prescriptionId=${script.id}`}
                                                                 >
                                                                     <Button
                                                                         onClick={() => {
@@ -1045,21 +1045,30 @@ export function DashboardClient({
                                                             </p>
                                                         </div>
                                                     </div>
-                                                    <Badge
-                                                        className={
-                                                            statusColors[
-                                                                order.status
-                                                            ] ||
-                                                            "bg-gray-100 text-gray-800"
-                                                        }
-                                                    >
-                                                        {order.status
-                                                            .charAt(0)
-                                                            .toUpperCase() +
-                                                            order.status.slice(
-                                                                1
-                                                            )}
-                                                    </Badge>
+                                                    <div className="flex gap-2 items-center">
+                                                        <Badge
+                                                            className={
+                                                                statusColors[
+                                                                    order.status
+                                                                ] ||
+                                                                "bg-gray-100 text-gray-800"
+                                                            }
+                                                        >
+                                                            {order.status
+                                                                .charAt(0)
+                                                                .toUpperCase() +
+                                                                order.status.slice(
+                                                                    1
+                                                                )}
+                                                        </Badge>
+                                                        <Link
+                                                            href={`/track-order?orderId=${order.id}`}
+                                                        >
+                                                            <Button>
+                                                                Track Order
+                                                            </Button>
+                                                        </Link>
+                                                    </div>
                                                 </div>
                                             );
                                         })}
