@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Heart,
   Eye,
@@ -20,6 +19,8 @@ import {
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/server";
 import { Hero } from "@/components/pet/pet-hero";
+import { Reminders } from "@/components/pet/pet-reminders";
+import { ServiceGrid } from "@/components/pet/pet-service-grid";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -52,6 +53,10 @@ export default async function Home() {
       {/* Main Content */}
       <main className="flex-1">
         <Hero />
+        <div className="bg-white rounded-t-[3rem] shadow-xl shadow-orange-100/50 relative z-10 pb-20">
+          <Reminders />
+          <ServiceGrid />
+        </div>
       </main>
 
       {/* Footer */}

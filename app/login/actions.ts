@@ -29,8 +29,9 @@ export async function signup(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const fullName = formData.get("fullName") as string;
-  const role = (formData.get("role") as string) || "patient";
-  const specialty = (formData.get("specialty") as string) || "General Medicine";
+  const role = (formData.get("role") as string) || "pet_owner";
+  const specialty = (formData.get("specialty") as string) || "General Practice";
+  const licenseNumber = (formData.get("licenseNumber") as string) || null;
   const nextUrl = (formData.get("next") as string) || null;
 
   // check if current user is anonymous (upgrading account)
@@ -71,18 +72,21 @@ export async function signup(formData: FormData) {
       .eq('user_id', currentUser.id)
       .eq('is_migrated', false)
 
-    // if upgrading to doctor, create doctor profile
-    if (role === 'doctor' && data.user) {
-      const { error: doctorError } = await supabase.from('doctors').insert({
+    // if upgrading to veterinarian, create veterinarian profile
+    if (role === 'veterinarian' && data.user) {
+      const licenseNumber = formData.get('licenseNumber') as string || null
+      const { error: vetError } = await supabase.from('veterinarians').insert({
         user_id: data.user.id,
         name: `Dr. ${fullName}`,
         specialty: specialty,
-        bio: `${specialty} specialist dedicated to providing quality healthcare.`,
+        license_number: licenseNumber,
+        species_treated: ['Dogs', 'Cats'],
+        bio: `${specialty} veterinarian dedicated to providing quality pet care.`,
         is_available: true,
       })
 
-      if (doctorError) {
-        console.error('Failed to create doctor profile:', doctorError)
+      if (vetError) {
+        console.error('Failed to create veterinarian profile:', vetError)
       }
     }
 
@@ -91,20 +95,38 @@ export async function signup(formData: FormData) {
   }
 
   // regular signup for new users
-  const { error } = await supabase.auth.signUp({
+  const { error, data: signupData } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: {
         full_name: fullName,
         role: role,
-        specialty,
+        specialty: role === 'veterinarian' ? specialty : null,
+        license_number: role === 'veterinarian' ? licenseNumber : null,
       },
     },
   });
 
   if (error) {
     return { error: error.message };
+  }
+
+  // if signing up as veterinarian, create veterinarian profile
+  if (role === 'veterinarian' && signupData?.user) {
+    const { error: vetError } = await supabase.from('veterinarians').insert({
+      user_id: signupData.user.id,
+      name: `Dr. ${fullName}`,
+      specialty: specialty,
+      license_number: licenseNumber,
+      species_treated: ['Dogs', 'Cats'],
+      bio: `${specialty} veterinarian dedicated to providing quality pet care.`,
+      is_available: true,
+    })
+
+    if (vetError) {
+      console.error('Failed to create veterinarian profile:', vetError)
+    }
   }
 
   revalidatePath("/", "layout");

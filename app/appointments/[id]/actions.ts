@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 
 export async function addAppointmentNotes(
   appointmentId: string,
-  notes: string
+  vetNotes: string
 ) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -15,31 +15,31 @@ export async function addAppointmentNotes(
     return { error: "Not authenticated" };
   }
 
-  // security: verify the user is the doctor for this appointment
-  const { data: doctor } = await supabase
-    .from("doctors")
+  // security: verify the user is the veterinarian for this appointment
+  const { data: vet } = await supabase
+    .from("veterinarians")
     .select("id")
     .eq("user_id", user.id)
     .single();
 
-  if (!doctor) {
-    return { error: "Only doctors can add consultation notes" };
+  if (!vet) {
+    return { error: "Only veterinarians can add consultation notes" };
   }
 
-  // verify this appointment belongs to this doctor
+  // verify this appointment belongs to this veterinarian
   const { data: appointment } = await supabase
     .from("appointments")
-    .select("doctor_id")
+    .select("veterinarian_id")
     .eq("id", appointmentId)
     .single();
 
-  if (!appointment || appointment.doctor_id !== doctor.id) {
+  if (!appointment || appointment.veterinarian_id !== vet.id) {
     return { error: "You do not have permission to modify this appointment" };
   }
 
   const { error } = await supabase
     .from("appointments")
-    .update({ notes, status: "completed" })
+    .update({ vet_notes: vetNotes, status: "completed" })
     .eq("id", appointmentId);
 
   if (error) {
@@ -53,10 +53,14 @@ export async function addAppointmentNotes(
 
 export async function createPrescription(data: {
   appointmentId: string;
-  patientId: string;
+  petId: string;
+  ownerId: string;
   medicationName: string;
   dosage: string;
   instructions: string;
+  petWeightKg?: number;
+  frequency?: string;
+  duration?: string;
 }) {
   const supabase = await createClient();
   const {
@@ -67,35 +71,40 @@ export async function createPrescription(data: {
     return { error: "Not authenticated" };
   }
 
-  // get doctor id from user
-  const { data: doctor } = await supabase
-    .from("doctors")
+  // get veterinarian id from user
+  const { data: vet } = await supabase
+    .from("veterinarians")
     .select("id")
     .eq("user_id", user.id)
     .single();
 
-  if (!doctor) {
-    return { error: "Doctor profile not found" };
+  if (!vet) {
+    return { error: "Veterinarian profile not found" };
   }
 
-  // security: verify the doctor has an appointment with this patient
+  // security: verify the veterinarian has an appointment with this pet/owner
   const { data: appointment } = await supabase
     .from("appointments")
     .select("id")
-    .eq("doctor_id", doctor.id)
-    .eq("patient_id", data.patientId)
+    .eq("veterinarian_id", vet.id)
+    .eq("owner_id", data.ownerId)
     .single();
 
   if (!appointment) {
-    return { error: "You can only prescribe to patients you have appointments with" };
+    return { error: "You can only prescribe for pets you have appointments with" };
   }
 
   const { error } = await supabase.from("prescriptions").insert({
-    patient_id: data.patientId,
-    doctor_id: doctor.id,
+    pet_id: data.petId,
+    owner_id: data.ownerId,
+    veterinarian_id: vet.id,
+    appointment_id: data.appointmentId,
     medication_name: data.medicationName,
     dosage: data.dosage,
     instructions: data.instructions,
+    pet_weight_kg: data.petWeightKg || null,
+    frequency: data.frequency || null,
+    duration: data.duration || null,
     status: "active",
     refills_remaining: 3,
   });
@@ -120,7 +129,7 @@ export async function cancelAppointment(appointmentId: string) {
   // security: verify the user owns this appointment
   const { data: appointment } = await supabase
     .from("appointments")
-    .select("patient_id")
+    .select("owner_id")
     .eq("id", appointmentId)
     .single();
 
@@ -128,7 +137,7 @@ export async function cancelAppointment(appointmentId: string) {
     return { error: "Appointment not found" };
   }
 
-  if (appointment.patient_id !== user.id) {
+  if (appointment.owner_id !== user.id) {
     return { error: "You do not have permission to cancel this appointment" };
   }
 
@@ -156,19 +165,19 @@ export async function confirmAppointment(appointmentId: string) {
     return { error: "Not authenticated" };
   }
 
-  const { data: doctorProfile, error: doctorError } = await supabase
-    .from("doctors")
+  const { data: vetProfile, error: vetError } = await supabase
+    .from("veterinarians")
     .select("id")
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (doctorError || !doctorProfile) {
-    return { error: "Doctor profile not found" };
+  if (vetError || !vetProfile) {
+    return { error: "Veterinarian profile not found" };
   }
 
   const { data: appointment, error: appointmentError } = await supabase
     .from("appointments")
-    .select("id, doctor_id, patient_id, status")
+    .select("id, veterinarian_id, owner_id, pet_id, status")
     .eq("id", appointmentId)
     .maybeSingle();
 
@@ -176,7 +185,7 @@ export async function confirmAppointment(appointmentId: string) {
     return { error: "Appointment not found" };
   }
 
-  if (appointment.doctor_id !== doctorProfile.id) {
+  if (appointment.veterinarian_id !== vetProfile.id) {
     return { error: "You are not assigned to this appointment" };
   }
 
@@ -208,8 +217,9 @@ export async function confirmAppointment(appointmentId: string) {
       .from("chat_rooms")
       .insert({
         appointment_id: appointmentId,
-        doctor_id: doctorProfile.id,
-        patient_id: appointment.patient_id,
+        veterinarian_id: vetProfile.id,
+        owner_id: appointment.owner_id,
+        pet_id: appointment.pet_id,
         status: "open",
       })
       .select("id")

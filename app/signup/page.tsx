@@ -37,21 +37,25 @@ function SubmitButton({ isUpgrade }: { isUpgrade: boolean }) {
 }
 
 const specialties = [
-  "General Medicine",
-  "Cardiology",
+  "General Practice",
+  "Surgery",
   "Dermatology",
-  "Pediatrics",
-  "Psychiatry",
-  "Orthopedics",
+  "Dentistry",
+  "Cardiology",
+  "Oncology",
   "Neurology",
   "Ophthalmology",
-  "Dentistry",
+  "Emergency & Critical Care",
+  "Exotic Animals",
 ];
 
-const pharmacies = [
-  "Mercury Drug - Multiple Branches Nationwide",
-  "Watsons Pharmacy - SM Megamall, Mandaluyong",
-  "Rose Pharmacy - Ayala Center, Makati",
+const speciesTreated = [
+  "Dogs",
+  "Cats",
+  "Birds",
+  "Rabbits",
+  "Reptiles",
+  "Small Mammals",
 ];
 
 // helper function to get prefill data from localStorage
@@ -81,8 +85,8 @@ function getGuestPrefillData(): { fullName: string; email: string } {
 
 function SignupForm() {
   const [error, setError] = useState<string | null>(null);
-  const [role, setRole] = useState<"patient" | "doctor" | "pharmacist">(
-    "patient"
+  const [role, setRole] = useState<"pet_owner" | "veterinarian">(
+    "pet_owner"
   );
   const [isAnonymous, setIsAnonymous] = useState(false);
   const fullNameRef = useRef<HTMLInputElement>(null);
@@ -125,13 +129,13 @@ function SignupForm() {
     <Card className="w-full max-w-md ">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold text-center text-blue-900">
-          {isUpgrade && isAnonymous ? "Complete Your Account" : "Join CareLink"}
+          {isUpgrade && isAnonymous ? "Complete Your Account" : "Join PetCare"}
         </CardTitle>
         <CardDescription className="text-center">
           {message ||
             (isUpgrade && isAnonymous
               ? "Register to book appointments and access your full dashboard"
-              : "Create an account to manage your health")}
+              : "Create an account to care for your pets")}
         </CardDescription>
       </CardHeader>
       <form action={handleSubmit}>
@@ -179,62 +183,61 @@ function SignupForm() {
           </div>
           <div className="space-y-2">
             <Label>I am a</Label>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
-                onClick={() => setRole("patient")}
+                onClick={() => setRole("pet_owner")}
                 className={`p-3 rounded-lg border-2 text-center transition-all hover:cursor-pointer ${
-                  role === "patient"
+                  role === "pet_owner"
                     ? "border-blue-600 bg-blue-50 text-blue-700"
                     : "border-gray-200 hover:border-gray-300"
                 }`}
               >
-                <div className="font-semibold">Patient</div>
-                <div className="text-xs text-gray-500">Book appointments</div>
+                <div className="font-semibold">Pet Owner</div>
+                <div className="text-xs text-gray-500">Book vet appointments</div>
               </button>
               <button
                 type="button"
-                onClick={() => setRole("doctor")}
+                onClick={() => setRole("veterinarian")}
                 className={`p-3 rounded-lg border-2 text-center transition-all hover:cursor-pointer ${
-                  role === "doctor"
+                  role === "veterinarian"
                     ? "border-blue-600 bg-blue-50 text-blue-700"
                     : "border-gray-200 hover:border-gray-300"
                 }`}
               >
-                <div className="font-semibold">Doctor</div>
-                <div className="text-xs text-gray-500">Manage patients</div>
-              </button>
-              <button
-                type="button"
-                onClick={() => setRole("pharmacist")}
-                className={`p-3 rounded-lg border-2 text-center transition-all hover:cursor-pointer ${
-                  role === "pharmacist"
-                    ? "border-blue-600 bg-blue-50 text-blue-700"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                <div className="font-semibold">Pharmacist</div>
-                <div className="text-xs text-gray-500">Manage medications</div>
+                <div className="font-semibold">Veterinarian</div>
+                <div className="text-xs text-gray-500">Manage pet patients</div>
               </button>
             </div>
           </div>
 
-          {role === "doctor" && (
-            <div className="space-y-2">
-              <Label htmlFor="specialty">Specialty</Label>
-              <select
-                id="specialty"
-                name="specialty"
-                className="w-full h-10 px-3 rounded-md border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              >
-                {specialties.map((spec) => (
-                  <option key={spec} value={spec}>
-                    {spec}
-                  </option>
-                ))}
-              </select>
-            </div>
+          {role === "veterinarian" && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="specialty">Specialty</Label>
+                <select
+                  id="specialty"
+                  name="specialty"
+                  className="w-full h-10 px-3 rounded-md border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                >
+                  {specialties.map((spec) => (
+                    <option key={spec} value={spec}>
+                      {spec}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="licenseNumber">License Number</Label>
+                <Input
+                  id="licenseNumber"
+                  name="licenseNumber"
+                  placeholder="VET-12345"
+                  required
+                />
+              </div>
+            </>
           )}
           <input type="hidden" name="role" value={role} />
           <input type="hidden" name="next" value={nextUrl || ""} />
