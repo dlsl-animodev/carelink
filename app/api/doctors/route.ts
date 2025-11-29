@@ -7,17 +7,26 @@ export const dynamic = 'force-dynamic'
 export async function GET() {
   const supabase = await createClient()
 
-  const { data: doctors, error } = await supabase
-    .from('doctors')
-    .select('*')
+  const { data: veterinarians, error } = await supabase
+    .from('veterinarians')
+    .select(`
+      *,
+      vet_clinics (
+        id,
+        name,
+        city,
+        emergency_services
+      )
+    `)
+    .eq('is_available', true)
     .order('name')
 
   if (error) {
-    console.error('Error fetching doctors:', error)
-    return NextResponse.json({ error: 'Unable to load doctors right now.' }, { status: 500 })
+    console.error('Error fetching veterinarians:', error)
+    return NextResponse.json({ error: 'Unable to load veterinarians right now.' }, { status: 500 })
   }
 
-  return NextResponse.json(doctors ?? [], {
+  return NextResponse.json(veterinarians ?? [], {
     headers: {
       'Cache-Control': 's-maxage=3600, stale-while-revalidate=300',
     },
