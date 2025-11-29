@@ -21,34 +21,6 @@ import {
 import { createClient } from "@/utils/supabase/server";
 import { Hero } from "@/components/pet/pet-hero";
 
-const SPECIALTIES = [
-  { name: "General Veterinary", icon: PillBottle },
-  { name: "Surgery", icon: ClipboardList },
-  { name: "Cardiology", icon: Heart },
-  { name: "Ophthalmology", icon: Eye },
-  { name: "Dentistry", icon: Pill },
-];
-
-const HOW_IT_WORKS = [
-  {
-    title: "Choose Your Veterinary Specialist",
-    description:
-      "Browse the list of available Specialist and select one that matches your pet needs.",
-    icon: UserRound,
-  },
-  {
-    title: "Book Your Appointment",
-    description: "Pick your preferred date, time, and consultation type.",
-    icon: CalendarCheck,
-  },
-  {
-    title: "Meet your veterinary specialist online",
-    description:
-      "Connect with your veterinary specialist and receive your medical evaluation right from your device.",
-    icon: Video,
-  },
-];
-
 export default async function Home() {
   const supabase = await createClient();
   const {
