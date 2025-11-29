@@ -953,9 +953,10 @@ export function DashboardClient({
                           </h3>
                           <div className="space-y-2">
                             {pastAppointments.map((apt) => (
-                              <div
+                              <Link
                                 key={apt.id}
-                                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                                href={`/appointments/${apt.id}`}
+                                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors hover:cursor-pointer"
                               >
                                 <div>
                                   <p className="font-medium text-gray-900">
@@ -981,7 +982,7 @@ export function DashboardClient({
                                     {apt.status}
                                   </Badge>
                                 </div>
-                              </div>
+                              </Link>
                             ))}
                           </div>
                         </div>
