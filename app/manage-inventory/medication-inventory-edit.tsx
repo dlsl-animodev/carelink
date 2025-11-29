@@ -23,7 +23,7 @@ export default function MedicationInventoryEdit({
             </Link>
             {/* Title  */}
             <div>
-                <h1 className="text-3xl font-bold text-blue-900">Item Name</h1>
+                <h1 className="text-3xl font-bold ">Item Name</h1>
                 <p className="text-gray-600">
                     Edit the details of your medication inventory item here.
                 </p>

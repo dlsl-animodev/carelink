@@ -99,7 +99,7 @@ export async function Header() {
             label: "Health",
             items: [
               {
-                href: "/dashboard?tab=prescriptions",
+                href: "/pharmacies",
                 label: "Pharmacy",
                 icon: <Pill className="h-4 w-4" />,
               },
